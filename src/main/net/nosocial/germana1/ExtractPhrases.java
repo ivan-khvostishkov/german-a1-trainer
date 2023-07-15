@@ -7,12 +7,11 @@ import com.amazonaws.services.textract.AmazonTextractClientBuilder;
 import com.amazonaws.services.textract.model.*;
 import com.amazonaws.services.textract.model.GetDocumentAnalysisResult;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+
 import java.util.List;
 
 public class ExtractPhrases {
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
 
         System.out.println("Extracting phrases with Amazon Textract...");
@@ -42,9 +41,10 @@ public class ExtractPhrases {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + (2 * 60 * 1000); // wait max 2 min
 
+        List<Block> blocks;
         while (System.currentTimeMillis() < endTime) {
             getDocResult = client.getDocumentAnalysis(new GetDocumentAnalysisRequest().withJobId(jobId));
-            List<Block> blocks = getDocResult.getBlocks();
+            blocks = getDocResult.getBlocks();
             if (blocks != null && blocks.size() > 0) {
                 break;
             }
@@ -61,8 +61,37 @@ public class ExtractPhrases {
             throw new IllegalStateException("No result");
         }
 
-        com.amazonaws.services.textract.model.Block block = getDocResult.getBlocks().get(0);
-        System.out.println("Block: " + block.getBlockType());
+        blocks = getDocResult.getBlocks();
+        for (Block block : blocks) {
+            if (block.getBlockType().equals("LINE")) {
+                System.out.println("Text:" + block.getText());
+            }
+            if (block.getBlockType().equals("KEY_VALUE_SET")) {
+                System.out.println("Key / value:" + block.getText());
+            }
+            if (block.getBlockType().equals("TABLE")) {
+                System.out.println("Table:" + block.getText());
+            }
+            if (block.getBlockType().equals("FORM")) {
+                System.out.println("Form:" + block.getText());
+            }
+            if (block.getBlockType().equals("CELL")) {
+                System.out.println("Cell:" + block.getText());
+            }
+            if (block.getBlockType().equals("SELECTION_ELEMENT")) {
+                System.out.println("Selection element:" + block.getText());
+            }
+            if (block.getBlockType().equals("PAGE")) {
+                System.out.println("Page:" + block.getText());
+            }
+            if (block.getBlockType().equals("WORD")) {
+                System.out.println("Word:" + block.getText());
+            }
+            if (block.getBlockType().equals("LINE_ITEM")) {
+                System.out.println("Line item:" + block.getText());
+            }
+        }
+
 
         System.out.println("Done.");
     }

@@ -1,12 +1,9 @@
 package net.nosocial.germana1;
 
-import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.textract.AmazonTextract;
-import com.amazonaws.services.textract.AmazonTextractClientBuilder;
-import com.amazonaws.services.textract.model.*;
+
 
 import java.io.IOException;
 import java.io.InputStream;
