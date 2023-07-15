@@ -36,21 +36,24 @@ public class ExtractPhrases {
         String jobId = result.getJobId();
         System.out.println("JobId: " + jobId);
 
+        // wait for job to complete
+
+
         GetDocumentAnalysisResult getDocResult = null;
 
         long startTime = System.currentTimeMillis();
         long endTime = startTime + (2 * 60 * 1000); // wait max 2 min
 
-        List<Block> blocks;
         while (System.currentTimeMillis() < endTime) {
             getDocResult = client.getDocumentAnalysis(new GetDocumentAnalysisRequest().withJobId(jobId));
-            blocks = getDocResult.getBlocks();
-            if (blocks != null && blocks.size() > 0) {
+            String jobStatus = getDocResult.getJobStatus();
+            System.out.println("Job status: " + jobStatus);
+            if (jobStatus.equals("SUCCEEDED")) {
                 break;
             }
             try {
                 //noinspection BusyWait
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -61,7 +64,7 @@ public class ExtractPhrases {
             throw new IllegalStateException("No result");
         }
 
-        blocks = getDocResult.getBlocks();
+        List<Block> blocks = getDocResult.getBlocks();
         for (Block block : blocks) {
             if (block.getBlockType().equals("LINE")) {
                 System.out.println("Text:" + block.getText());
