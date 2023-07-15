@@ -64,7 +64,7 @@ public class ExtractPhrases {
             throw new IllegalStateException("No result");
         }
 
-        String nextToken = null;
+        String nextToken;
         do {
             dumpBlocks(getDocResult);
             nextToken = getDocResult.getNextToken();
@@ -78,35 +78,22 @@ public class ExtractPhrases {
         System.out.println("Done.");
     }
 
+    private static int page = 0;
+
     private static void dumpBlocks(GetDocumentAnalysisResult getDocResult) {
         List<Block> blocks = getDocResult.getBlocks();
         for (Block block : blocks) {
-            if (block.getBlockType().equals("LINE")) {
-                System.out.println("Text:" + block.getText());
-            }
-            if (block.getBlockType().equals("KEY_VALUE_SET")) {
-                System.out.println("Key / value:" + block.getText());
-            }
-            if (block.getBlockType().equals("TABLE")) {
-                System.out.println("Table:" + block.getText());
-            }
-            if (block.getBlockType().equals("FORM")) {
-                System.out.println("Form:" + block.getText());
-            }
-            if (block.getBlockType().equals("CELL")) {
-                System.out.println("Cell:" + block.getText());
-            }
-            if (block.getBlockType().equals("SELECTION_ELEMENT")) {
-                System.out.println("Selection element:" + block.getText());
-            }
             if (block.getBlockType().equals("PAGE")) {
-                System.out.println("Page:" + block.getText());
+                page++;
             }
-            if (block.getBlockType().equals("WORD")) {
-                System.out.println("Word:" + block.getText());
-            }
-            if (block.getBlockType().equals("LINE_ITEM")) {
-                System.out.println("Line item:" + block.getText());
+            if (block.getBlockType().equals("LINE") && page >= 9 && page <= 27) {
+                Geometry geometry = block.getGeometry();
+                float left = geometry.getBoundingBox().getLeft();
+                float top = geometry.getBoundingBox().getTop();
+                float bottom = geometry.getBoundingBox().getTop() + geometry.getBoundingBox().getHeight();
+                if (left > 0.39 && top > 0.14 && bottom < 0.93) {
+                    System.out.println(block.getText());
+                }
             }
         }
     }
