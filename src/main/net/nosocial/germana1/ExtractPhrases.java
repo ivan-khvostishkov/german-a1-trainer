@@ -64,6 +64,21 @@ public class ExtractPhrases {
             throw new IllegalStateException("No result");
         }
 
+        String nextToken = null;
+        do {
+            dumpBlocks(getDocResult);
+            nextToken = getDocResult.getNextToken();
+            if (nextToken != null) {
+                getDocResult = client.getDocumentAnalysis(new GetDocumentAnalysisRequest()
+                        .withJobId(jobId).withNextToken(nextToken));
+            }
+        } while (nextToken != null);
+
+
+        System.out.println("Done.");
+    }
+
+    private static void dumpBlocks(GetDocumentAnalysisResult getDocResult) {
         List<Block> blocks = getDocResult.getBlocks();
         for (Block block : blocks) {
             if (block.getBlockType().equals("LINE")) {
@@ -94,8 +109,5 @@ public class ExtractPhrases {
                 System.out.println("Line item:" + block.getText());
             }
         }
-
-
-        System.out.println("Done.");
     }
 }
