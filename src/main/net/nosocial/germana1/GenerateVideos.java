@@ -23,18 +23,8 @@ public class GenerateVideos {
 
         System.out.println("Generating videos with FFMpeg...");
 
-        List<S3ObjectSummary> objectSummaries = s3Client.listObjects(DownloadWordList.BUCKET_NAME, S3_PATH).getObjectSummaries();
-        int count = 0;
-        for (S3ObjectSummary objectSummary : objectSummaries) {
-            if (objectSummary.getSize() > 0) {
-                count++;
-            }
-        }
+        int count = countNarratedFiles();
         int totalPhrases = count / 9;
-        if (count % 9 != 0) {
-            System.out.println("Files count is not divisible by 9");
-            return;
-        }
         System.out.println("Found " + count + " files for " + totalPhrases + " phrases");
 
         System.out.println("Downloading files...");
@@ -53,6 +43,21 @@ public class GenerateVideos {
         if (!uploadFiles()) return;
 
         System.out.println("Done");
+    }
+
+    static Integer countNarratedFiles() {
+        List<S3ObjectSummary> objectSummaries = s3Client.listObjects(DownloadWordList.BUCKET_NAME, S3_PATH).getObjectSummaries();
+        int count = 0;
+        for (S3ObjectSummary objectSummary : objectSummaries) {
+            if (objectSummary.getSize() > 0) {
+                count++;
+            }
+        }
+        if (count % 9 != 0) {
+            System.out.println("Files count is not divisible by 9");
+            System.exit(1);
+        }
+        return count;
     }
 
     private static void generateVideoWithSubtitles(String mp3FileName) throws IOException, InterruptedException {
