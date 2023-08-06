@@ -18,9 +18,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class NarratePhrases {
-    public static final String S3_MP3_PATH_DE = "goethe_de/narrate/a1-phrases-%03d-01-de.mp3";
-    public static final String S3_MP3_PATH_EN = "goethe_de/narrate/a1-phrases-%03d-02-en.mp3";
-    public static final String S3_MP3_PATH_DE_SLOW = "goethe_de/narrate/a1-phrases-%03d-03-de-slow.mp3";
+    public static final String MP3_FILE_NAME_DE = "a1-phrases-%03d-01-de.mp3";
+    public static final String S3_MP3_PATH_DE = "goethe_de/narrate/" + MP3_FILE_NAME_DE;
+    public static final String MP3_FILE_NAME_EN = "a1-phrases-%03d-02-en.mp3";
+    public static final String S3_MP3_PATH_EN = "goethe_de/narrate/" + MP3_FILE_NAME_EN;
+    public static final String MP3_FILE_NAME_DE_SLOW = "a1-phrases-%03d-03-de-slow.mp3";
+    public static final String S3_MP3_PATH_DE_SLOW = "goethe_de/narrate/" + MP3_FILE_NAME_DE_SLOW;
 
     public static final AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
             .withRegion("eu-west-1")
