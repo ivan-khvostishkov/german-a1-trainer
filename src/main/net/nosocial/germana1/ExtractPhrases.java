@@ -46,10 +46,7 @@ public class ExtractPhrases {
 
         List<String> phrases = getAllPhrases(client, jobId);
 
-        // TODO: remove brackets (txt)
-        // TODO: join lines
-
-        System.out.println("Found " + phrases.size() + " phrases");
+        System.out.println("Found " + phrases.size() + " lines of phrases");
 
         System.out.println("Saving phrases to " + LOCAL_PATH + "...");
         try {
@@ -141,7 +138,7 @@ public class ExtractPhrases {
                 float left = geometry.getBoundingBox().getLeft();
                 float top = geometry.getBoundingBox().getTop();
                 float bottom = geometry.getBoundingBox().getTop() + geometry.getBoundingBox().getHeight();
-                if (left > 0.39 && top > 0.14 && bottom < 0.93) {
+                if (left > 0.39 && top > 0.12 && bottom < 0.93) {
                     result.add(block.getText());
                 }
             }
