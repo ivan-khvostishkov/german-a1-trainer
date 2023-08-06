@@ -5,6 +5,7 @@ package net.nosocial.germana1;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import java.io.IOException;
@@ -46,11 +47,19 @@ public class GenerateVideos {
     }
 
     static Integer countNarratedFiles() {
-        List<S3ObjectSummary> objectSummaries = s3Client.listObjects(DownloadWordList.BUCKET_NAME, S3_PATH).getObjectSummaries();
+        ObjectListing objectListing = s3Client.listObjects(DownloadWordList.BUCKET_NAME, S3_PATH);
         int count = 0;
-        for (S3ObjectSummary objectSummary : objectSummaries) {
-            if (objectSummary.getSize() > 0) {
-                count++;
+        while (true) {
+            List<S3ObjectSummary> objectSummaries = objectListing.getObjectSummaries();
+            for (S3ObjectSummary objectSummary : objectSummaries) {
+                if (objectSummary.getSize() > 0) {
+                    count++;
+                }
+            }
+            if (objectListing.isTruncated()) {
+                objectListing = s3Client.listNextBatchOfObjects(objectListing);
+            } else {
+                break;
             }
         }
         if (count % 9 != 0) {
