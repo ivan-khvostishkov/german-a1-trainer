@@ -47,9 +47,20 @@ public class NarratePhrases {
             return;
         }
 
+        String text = """
+                Test
+                Test
+                Test
+                """;
+
+        text = text.replace("\"", "&quot;");
+        text = text.replace("'", "&apos;");
+        text = text.replaceAll("\\(.+\\)", "");
+        text = text.replace("\n", "\n<break time=\"5s\"/>\n");
+        text = "<speak><prosody rate=\"x-slow\">\n" + text + "</prosody></speak>";
+
         SynthesizeSpeechRequest synthReq =
-                new SynthesizeSpeechRequest().withText("""
-                                Test""")
+                new SynthesizeSpeechRequest().withText(text).withTextType(TextType.Ssml)
                         .withVoiceId(voice.getId())
                         .withOutputFormat(OutputFormat.Mp3)
                         .withEngine("neural");

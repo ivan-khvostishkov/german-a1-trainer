@@ -46,6 +46,9 @@ public class ExtractPhrases {
 
         List<String> phrases = getAllPhrases(client, jobId);
 
+        // TODO: remove brackets (txt)
+        // TODO: join lines
+
         System.out.println("Found " + phrases.size() + " phrases");
 
         System.out.println("Saving phrases to " + LOCAL_PATH + "...");
