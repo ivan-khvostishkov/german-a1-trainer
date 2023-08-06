@@ -38,19 +38,28 @@ public class NarratePhrases {
         List<Voice> voices = describeVoicesResult.getVoices();
 
         Voice voice = null;
+        Voice englishVoice = null;
         for (Voice v : voices) {
             if (v.getId().equals("Daniel") && v.getLanguageCode().equals("de-DE")
+                    && v.getGender().equals("Male")
                     && v.getSupportedEngines().contains("neural")) {
                 voice = v;
-                break;
+            }
+            if (v.getId().equals("Amy") && v.getLanguageCode().equals("en-GB")
+                    && v.getGender().equals("Female")
+                    && v.getSupportedEngines().contains("neural")) {
+                englishVoice = v;
             }
         }
 
-        System.out.println("Will use the voice: " + voice);
-        if (voice == null) {
-            System.out.println("Voice not found!");
+        System.out.println("Will use the German voice: " + voice);
+        System.out.println("Will use the English voice: " + englishVoice);
+        if (voice == null || englishVoice == null) {
+            System.out.println("Voices not found!");
             return;
         }
+
+        System.exit(0);
 
         String text = """
                 Test
