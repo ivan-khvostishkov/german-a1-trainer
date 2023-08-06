@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 import java.io.File;
+import java.io.IOException;
 
 import static net.nosocial.germana1.GenerateVideos.countNarratedFiles;
 
@@ -17,7 +18,7 @@ public class AssembleFinalVideo {
             .withRegion("eu-west-1")
             .build();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
 
         System.out.println("Generating randomized file list...");
@@ -71,5 +72,31 @@ public class AssembleFinalVideo {
             System.exit(1);
         }
 
+        assembleFinalVideo();
+
+        System.out.println("Uploading " + FILE_NAME + " to S3...");
+        s3Client.putObject(DownloadWordList.BUCKET_NAME, PATH, new File("out/" + FILE_NAME));
+
+        System.out.println("Done!");
     }
+
+    private static void assembleFinalVideo() throws IOException, InterruptedException {
+        System.out.println("Generating " + FILE_NAME + "...");
+
+        ProcessBuilder builder = new ProcessBuilder(
+                "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+                "-i", "./out/mp4-file-list.txt",
+                "-c", "copy",
+                "./out/" + FILE_NAME
+        );
+        Process p = builder.start();
+        if (p.waitFor() != 0) {
+            System.out.println("Error assembling video");
+            // fetch stdout and stderr
+            System.out.println(new String(p.getInputStream().readAllBytes()));
+            System.out.println(new String(p.getErrorStream().readAllBytes()));
+            System.exit(1);
+        }
+    }
+
 }
