@@ -12,7 +12,6 @@ import java.util.List;
 
 public class GenerateVideos {
     public static final String S3_PATH = "goethe_de/narrate/";
-    public static final String MP4_FILE_NAME = "a1-phrases-%03d.mp4";
     public static final String S3_MP4_PATH = "goethe_de/videos/";
 
     public static final AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
@@ -45,7 +44,7 @@ public class GenerateVideos {
 
         for (int i = 0; i < totalPhrases; i++) {
             String mp3FileName = String.format(NarratePhrases.MP3_FILE_NAME_DE, i + 1);
-            String mp4FileName = String.format(MP4_FILE_NAME, i + 1);
+            String mp4FileName = mp3FileName.replace(".mp3", ".mp4");
             System.out.println("Generating " + mp4FileName + " from " + mp3FileName);
 
             @SuppressWarnings("SpellCheckingInspection")
