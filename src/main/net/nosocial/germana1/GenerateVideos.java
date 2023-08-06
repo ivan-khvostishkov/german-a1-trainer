@@ -43,27 +43,9 @@ public class GenerateVideos {
         System.out.println("Generating videos...");
 
         for (int i = 0; i < totalPhrases; i++) {
-            String mp3FileName = String.format(NarratePhrases.MP3_FILE_NAME_DE, i + 1);
-            String mp4FileName = mp3FileName.replace(".mp3", ".mp4");
-            System.out.println("Generating " + mp4FileName + " from " + mp3FileName);
-
-            @SuppressWarnings("SpellCheckingInspection")
-            ProcessBuilder builder = new ProcessBuilder(
-                    "ffmpeg", "-y", "-i", "./out/narrate/" + mp3FileName,
-                    "-loop", "1", "-i", "./img/german-a1-trainer.png",
-                    "-vf", "subtitles=./out/narrate/" + mp3FileName.replace(".mp3", ".srt"),
-                    "-c:v", "libx264", "-tune", "stillimage", "-crf", "0", "-c:a", "copy", "-shortest",
-                    "./out/videos/" + mp4FileName
-            );
-            // start the process
-            Process p = builder.start();
-            if (p.waitFor() != 0) {
-                System.out.println("Error generating video");
-                // fetch stdout and stderr
-                System.out.println(new String(p.getInputStream().readAllBytes()));
-                System.out.println(new String(p.getErrorStream().readAllBytes()));
-                return;
-            }
+            generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_DE, i + 1));
+            generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_DE_SLOW, i + 1));
+            generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_EN, i + 1));
         }
 
         System.out.println("Uploading videos to S3...");
@@ -71,6 +53,29 @@ public class GenerateVideos {
         if (!uploadFiles()) return;
 
         System.out.println("Done");
+    }
+
+    private static void generateVideoWithSubtitles(String mp3FileName) throws IOException, InterruptedException {
+        String mp4FileName = mp3FileName.replace(".mp3", ".mp4");
+        System.out.println("Generating " + mp4FileName + " from " + mp3FileName);
+
+        @SuppressWarnings("SpellCheckingInspection")
+        ProcessBuilder builder = new ProcessBuilder(
+                "ffmpeg", "-y", "-i", "./out/narrate/" + mp3FileName,
+                "-loop", "1", "-i", "./img/german-a1-trainer.png",
+                "-vf", "subtitles=./out/narrate/" + mp3FileName.replace(".mp3", ".srt"),
+                "-c:v", "libx264", "-tune", "stillimage", "-crf", "0", "-c:a", "copy", "-shortest",
+                "./out/videos/" + mp4FileName
+        );
+        // start the process
+        Process p = builder.start();
+        if (p.waitFor() != 0) {
+            System.out.println("Error generating video");
+            // fetch stdout and stderr
+            System.out.println(new String(p.getInputStream().readAllBytes()));
+            System.out.println(new String(p.getErrorStream().readAllBytes()));
+            System.exit(1);
+        }
     }
 
     private static boolean downloadFiles() throws IOException, InterruptedException {
