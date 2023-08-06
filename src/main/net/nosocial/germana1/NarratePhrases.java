@@ -108,10 +108,6 @@ public class NarratePhrases {
 
             String englishFileName = String.format(S3_MP3_PATH_EN, i + 1);
             narrate(polly, englishVoice, englishPhraseSSML, englishFileName, englishPhrases[i]);
-
-            if (i >= 2) {
-                break;
-            }
         }
 
         System.out.println("Done.");
