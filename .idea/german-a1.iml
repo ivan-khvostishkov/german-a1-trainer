@@ -11,5 +11,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="amazonaws.aws.java.sdk.s3" level="project" />
     <orderEntry type="library" name="amazonaws.aws.java.sdk.textract" level="project" />
+    <orderEntry type="library" name="amazonaws.aws.java.sdk.sts" level="project" />
   </component>
 </module>

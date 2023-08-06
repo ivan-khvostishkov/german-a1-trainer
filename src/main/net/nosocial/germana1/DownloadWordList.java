@@ -15,6 +15,7 @@ public class DownloadWordList {
 
     public static final String BUCKET_NAME = "german-a1-trainer";
     public static final String PATH = "goethe_de/A1_SD1_Wortliste_02.pdf";
+    public static final String FILE_URL = "https://www.goethe.de/pro/relaunch/prf/de/A1_SD1_Wortliste_02.pdf";
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
@@ -41,9 +42,7 @@ public class DownloadWordList {
 
         System.out.println("Downloading file to S3...");
 
-        String fileUrl = "https://www.goethe.de/pro/relaunch/prf/de/A1_SD1_Wortliste_02.pdf";
-
-        InputStream inputStream = new URI(fileUrl).toURL().openStream();
+        InputStream inputStream = new URI(FILE_URL).toURL().openStream();
         s3Client.putObject(BUCKET_NAME, PATH, inputStream, null);
 
         System.out.println("Done.");

@@ -2,15 +2,23 @@ package net.nosocial.germana1;
 
 import com.amazonaws.client.builder.AwsClientBuilder;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.textract.AmazonTextract;
 import com.amazonaws.services.textract.AmazonTextractClientBuilder;
 import com.amazonaws.services.textract.model.*;
 import com.amazonaws.services.textract.model.GetDocumentAnalysisResult;
 
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExtractPhrases {
+    public static final String FILE_NAME = "a1-phrases.txt";
+    public static final String LOCAL_PATH = "out/" + FILE_NAME;
+    public static final String S3_PATH = "goethe_de/" + FILE_NAME;
+
     public static void main(String[] args) {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
 
@@ -36,9 +44,47 @@ public class ExtractPhrases {
         String jobId = result.getJobId();
         System.out.println("JobId: " + jobId);
 
+        List<String> phrases = getAllPhrases(client, jobId);
+
+        System.out.println("Found " + phrases.size() + " phrases");
+
+        System.out.println("Saving phrases to " + LOCAL_PATH + "...");
+        try {
+            savePhrases(phrases, LOCAL_PATH);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        System.out.println("Uploading phrases to S3...");
+
+        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withRegion("eu-west-1")
+                .build();
+
+        s3Client.putObject(DownloadWordList.BUCKET_NAME, S3_PATH, new File(LOCAL_PATH));
+
+        System.out.println("Done.");
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static void savePhrases(List<String> phrases, String fileName) {
+        StringBuilder sb = new StringBuilder();
+        for (String phrase : phrases) {
+            sb.append(phrase).append("\n");
+        }
+        try (java.io.PrintWriter out = new java.io.PrintWriter(fileName)) {
+            out.print(sb);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        int charCount = sb.toString().length();
+        System.out.println("Saved " + charCount + " characters to " + fileName);
+    }
+
+    private static List<String> getAllPhrases(AmazonTextract client, String jobId) {
         // wait for job to complete
-
-
         GetDocumentAnalysisResult getDocResult = null;
 
         long startTime = System.currentTimeMillis();
@@ -64,23 +110,24 @@ public class ExtractPhrases {
             throw new IllegalStateException("No result");
         }
 
+        List<String> phrases = new ArrayList<>();
         String nextToken;
         do {
-            dumpBlocks(getDocResult);
+            List<String> tokenPhrases = getPhrases(getDocResult);
+            phrases.addAll(tokenPhrases);
             nextToken = getDocResult.getNextToken();
             if (nextToken != null) {
                 getDocResult = client.getDocumentAnalysis(new GetDocumentAnalysisRequest()
                         .withJobId(jobId).withNextToken(nextToken));
             }
         } while (nextToken != null);
-
-
-        System.out.println("Done.");
+        return phrases;
     }
 
     private static int page = 0;
 
-    private static void dumpBlocks(GetDocumentAnalysisResult getDocResult) {
+    private static List<String> getPhrases(GetDocumentAnalysisResult getDocResult) {
+        List<String> result = new ArrayList<>();
         List<Block> blocks = getDocResult.getBlocks();
         for (Block block : blocks) {
             if (block.getBlockType().equals("PAGE")) {
@@ -92,9 +139,10 @@ public class ExtractPhrases {
                 float top = geometry.getBoundingBox().getTop();
                 float bottom = geometry.getBoundingBox().getTop() + geometry.getBoundingBox().getHeight();
                 if (left > 0.39 && top > 0.14 && bottom < 0.93) {
-                    System.out.println(block.getText());
+                    result.add(block.getText());
                 }
             }
         }
+        return result;
     }
 }
