@@ -98,19 +98,13 @@ public class NarratePhrases {
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
             String germanFileName = String.format(S3_MP3_PATH_DE, i + 1);
-            synthesizeAudio(polly, germanVoice, germanPhraseSSML, germanFileName);
-            synthesizeSpeechMarks(polly, germanVoice, germanPhraseSSML, germanFileName.replace(".mp3", ".json"));
-            covertSpeechMarksToSubtitles(germanPhrases[i], germanFileName.replace(".mp3", ".json"), germanFileName.replace(".mp3", ".srt"));
+            narrate(polly, germanVoice, germanPhraseSSML, germanFileName, germanPhrases[i]);
 
             String germanSlowFileName = String.format(S3_MP3_PATH_DE_SLOW, i + 1);
-            synthesizeAudio(polly, germanVoice, germanPhraseSlowSSML, germanSlowFileName);
-            synthesizeSpeechMarks(polly, germanVoice, germanPhraseSlowSSML, germanSlowFileName.replace(".mp3", ".json"));
-            covertSpeechMarksToSubtitles(germanPhrases[i], germanSlowFileName.replace(".mp3", ".json"), germanFileName.replace(".mp3", ".srt"));
+            narrate(polly, germanVoice, germanPhraseSlowSSML, germanSlowFileName, germanPhrases[i]);
 
             String englishFileName = String.format(S3_MP3_PATH_EN, i + 1);
-            synthesizeAudio(polly, englishVoice, englishPhraseSSML, englishFileName);
-            synthesizeSpeechMarks(polly, englishVoice, englishPhraseSSML, englishFileName.replace(".mp3", ".json"));
-            covertSpeechMarksToSubtitles(englishPhrases[i], englishFileName.replace(".mp3", ".json"), germanFileName.replace(".mp3", ".srt"));
+            narrate(polly, englishVoice, englishPhraseSSML, englishFileName, englishPhrases[i]);
 
             if (i >= 2) {
                 break;
@@ -120,7 +114,13 @@ public class NarratePhrases {
         System.out.println("Done.");
     }
 
-    private static void covertSpeechMarksToSubtitles(String germanPhrase, String jsonS3Path, String srtS3Path) throws IOException {
+    private static void narrate(AmazonPolly polly, Voice voice, String phraseSSML, String fileName, String phrase) throws IOException {
+        synthesizeAudio(polly, voice, phraseSSML, fileName);
+        synthesizeSpeechMarks(polly, voice, phraseSSML, fileName.replace(".mp3", ".json"));
+        covertSpeechMarksToSubtitles(phrase, fileName.replace(".mp3", ".json"), fileName.replace(".mp3", ".srt"));
+    }
+
+    private static void covertSpeechMarksToSubtitles(String phrase, String jsonS3Path, String srtS3Path) throws IOException {
         System.out.println("Converting speech marks to subtitles...");
         String jsonLines = s3Client.getObjectAsString(DownloadWordList.BUCKET_NAME, jsonS3Path);
         String[] json = jsonLines.split("\n");
@@ -139,7 +139,7 @@ public class NarratePhrases {
             bw.write(startTime.format(DateTimeFormatter.ofPattern("HH:mm:ss,SSS"))
                     + " --> "
                     + endTime.format(DateTimeFormatter.ofPattern("HH:mm:ss,SSS")) + "\n");
-            bw.write(germanPhrase + "\n");
+            bw.write(phrase + "\n");
         }
 
         InputStream srtS3Stream = new ByteArrayInputStream(w.toString().getBytes());
