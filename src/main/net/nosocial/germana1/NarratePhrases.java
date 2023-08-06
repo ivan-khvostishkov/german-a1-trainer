@@ -15,8 +15,8 @@ import java.util.List;
 
 public class NarratePhrases {
     public static final String S3_MP3_PATH_DE = "goethe_de/narrate/a1-phrases-%03d-01-de.mp3";
-    public static final String S3_MP3_PATH_DE_SLOW = "goethe_de/narrate/a1-phrases-%03d-02-de-slow.mp3";
-    public static final String S3_MP3_PATH_EN = "goethe_de/narrate/a1-phrases-%03d-03-en.mp3";
+    public static final String S3_MP3_PATH_EN = "goethe_de/narrate/a1-phrases-%03d-02-en.mp3";
+    public static final String S3_MP3_PATH_DE_SLOW = "goethe_de/narrate/a1-phrases-%03d-03-de-slow.mp3";
 
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -75,15 +75,18 @@ public class NarratePhrases {
             System.out.println("Narrating phrase " + (i + 1) + " of " + germanPhrases.length);
 
             String germanPhrase = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
-                    + quoteForPolly(germanPhrases[i]).replace("\n", "\n<break time=\"5s\"/>\n")
+                    + quoteForPolly(germanPhrases[i])
+                    + "\n<break time=\"5s\"/>\n"
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
             String germanPhraseSlow = "<speak><mark name=\"sub_start\"/><prosody rate=\"x-slow\">\n"
-                    + quoteForPolly(germanPhrases[i]).replace("\n", "\n<break time=\"5s\"/>\n")
+                    + quoteForPolly(germanPhrases[i])
+                    + "\n<break time=\"5s\"/>\n"
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
             String englishPhrase = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
-                    + quoteForPolly(englishPhrases[i]).replace("\n", "\n<break time=\"5s\"/>\n")
+                    + quoteForPolly(englishPhrases[i])
+                    + "\n<break time=\"5s\"/>\n"
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
             String germanFileName = String.format(S3_MP3_PATH_DE, i + 1);
