@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) 2023 Ivan Khvostishkov & NoSocial.Net
+ */
 package net.nosocial.germana1;
 
 public class TranslatePhrases {
