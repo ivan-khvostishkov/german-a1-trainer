@@ -10,16 +10,16 @@ import com.amazonaws.services.polly.model.*;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 
 public class NarratePhrases {
-    public static final String MP3_FILE_NAME = "a1-phrases-00.mp3";
-    public static final String JSON_FILE_NAME = "a1-phrases-00.json";
-    public static final String S3_MP3_PATH = "goethe_de/narrate/" + MP3_FILE_NAME;
-    public static final String S3_JSON_PATH = "goethe_de/narrate/" + JSON_FILE_NAME;
+    public static final String S3_MP3_PATH_DE = "goethe_de/narrate/a1-phrases-%03d-01-de.mp3";
+    public static final String S3_MP3_PATH_DE_SLOW = "goethe_de/narrate/a1-phrases-%03d-02-de-slow.mp3";
+    public static final String S3_MP3_PATH_EN = "goethe_de/narrate/a1-phrases-%03d-03-en.mp3";
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws FileNotFoundException {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
 
         System.out.println("Narrating phrases with Amazon Polly...");
@@ -37,13 +37,13 @@ public class NarratePhrases {
         DescribeVoicesResult describeVoicesResult = polly.describeVoices(describeVoicesRequest);
         List<Voice> voices = describeVoicesResult.getVoices();
 
-        Voice voice = null;
+        Voice germanVoice = null;
         Voice englishVoice = null;
         for (Voice v : voices) {
             if (v.getId().equals("Daniel") && v.getLanguageCode().equals("de-DE")
                     && v.getGender().equals("Male")
                     && v.getSupportedEngines().contains("neural")) {
-                voice = v;
+                germanVoice = v;
             }
             if (v.getId().equals("Amy") && v.getLanguageCode().equals("en-GB")
                     && v.getGender().equals("Female")
@@ -52,36 +52,68 @@ public class NarratePhrases {
             }
         }
 
-        System.out.println("Will use the German voice: " + voice);
-        System.out.println("Will use the English voice: " + englishVoice);
-        if (voice == null || englishVoice == null) {
+        System.out.println("Will use the German germanVoice: " + germanVoice);
+        System.out.println("Will use the English germanVoice: " + englishVoice);
+        if (germanVoice == null || englishVoice == null) {
             System.out.println("Voices not found!");
             return;
         }
 
-        System.exit(0);
+        File germanFile = new File(TranslatePhrases.LOCAL_PATH_IN);
+        File englishFile = new File(TranslatePhrases.LOCAL_PATH_OUT);
 
-        String text = """
-                Test
-                Test
-                Test
-                """;
+        // Read text file line by line
+        String[] germanPhrases = new BufferedReader(new FileReader(germanFile)).lines().toArray(String[]::new);
+        String[] englishPhrases = new BufferedReader(new FileReader(englishFile)).lines().toArray(String[]::new);
 
-        text = text.replace("\"", "&quot;");
-        text = text.replace("'", "&apos;");
-        text = text.replaceAll("\\(.+\\)", "");
-        text = text.replace("\n", "\n<break time=\"5s\"/>\n");
-        text = "<speak><mark name=\"sub_start\"/><prosody rate=\"x-slow\">\n"
-                + text
-                + "</prosody><mark name=\"sub_end\"/></speak>";
+        if (germanPhrases.length != englishPhrases.length) {
+            System.out.println("Phrases count mismatch!");
+            return;
+        }
 
-        synthesizeGermanAudio(polly, voice, text);
-        synthesizeGermanSpeechMarks(polly, voice, text);
+        for (int i = 0; i < germanPhrases.length; i++) {
+            System.out.println("Narrating phrase " + (i + 1) + " of " + germanPhrases.length);
+
+            String germanPhrase = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
+                    + quoteForPolly(germanPhrases[i]).replace("\n", "\n<break time=\"5s\"/>\n")
+                    + "</prosody><mark name=\"sub_end\"/></speak>";
+
+            String germanPhraseSlow = "<speak><mark name=\"sub_start\"/><prosody rate=\"x-slow\">\n"
+                    + quoteForPolly(germanPhrases[i]).replace("\n", "\n<break time=\"5s\"/>\n")
+                    + "</prosody><mark name=\"sub_end\"/></speak>";
+
+            String englishPhrase = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
+                    + quoteForPolly(englishPhrases[i]).replace("\n", "\n<break time=\"5s\"/>\n")
+                    + "</prosody><mark name=\"sub_end\"/></speak>";
+
+            String germanFileName = String.format(S3_MP3_PATH_DE, i + 1);
+            synthesizeAudio(polly, germanVoice, germanPhrase, germanFileName);
+            synthesizeSpeechMarks(polly, germanVoice, germanPhrase, germanFileName.replace(".mp3", ".json"));
+
+            String germanSlowFileName = String.format(S3_MP3_PATH_DE_SLOW, i + 1);
+            synthesizeAudio(polly, germanVoice, germanPhraseSlow, germanSlowFileName);
+            synthesizeSpeechMarks(polly, germanVoice, germanPhraseSlow, germanSlowFileName.replace(".mp3", ".json"));
+
+            String englishFileName = String.format(S3_MP3_PATH_EN, i + 1);
+            synthesizeAudio(polly, englishVoice, englishPhrase, englishFileName);
+            synthesizeSpeechMarks(polly, englishVoice, englishPhrase, englishFileName.replace(".mp3", ".json"));
+
+            if (i >= 2) {
+                break;
+            }
+        }
 
         System.out.println("Done.");
     }
 
-    private static void synthesizeGermanAudio(AmazonPolly polly, Voice voice, String text) {
+    private static String quoteForPolly(String text) {
+        text = text.replace("\"", "&quot;");
+        text = text.replace("'", "&apos;");
+        text = text.replaceAll("\\(.+\\)", "");
+        return text;
+    }
+
+    private static void synthesizeAudio(AmazonPolly polly, Voice voice, String text, String s3Path) {
         SynthesizeSpeechRequest synthReq =
                 new SynthesizeSpeechRequest().withText(text).withTextType(TextType.Ssml)
                         .withVoiceId(voice.getId())
@@ -90,15 +122,15 @@ public class NarratePhrases {
         SynthesizeSpeechResult synthRes = polly.synthesizeSpeech(synthReq);
         InputStream synthStream = synthRes.getAudioStream();
 
-        System.out.println("Saving German audio to S3...");
+        System.out.println("Saving audio to S3...");
 
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                 .withRegion("eu-west-1")
                 .build();
-        s3Client.putObject(DownloadWordList.BUCKET_NAME, S3_MP3_PATH, synthStream, null);
+        s3Client.putObject(DownloadWordList.BUCKET_NAME, s3Path, synthStream, null);
     }
 
-    private static void synthesizeGermanSpeechMarks(AmazonPolly polly, Voice voice, String text) {
+    private static void synthesizeSpeechMarks(AmazonPolly polly, Voice voice, String text, String s3Path) {
         SynthesizeSpeechRequest synthReq =
                 new SynthesizeSpeechRequest().withText(text).withTextType(TextType.Ssml)
                         .withSpeechMarkTypes(SpeechMarkType.Ssml)
@@ -108,11 +140,11 @@ public class NarratePhrases {
         SynthesizeSpeechResult synthRes = polly.synthesizeSpeech(synthReq);
         InputStream synthStream = synthRes.getAudioStream();
 
-        System.out.println("Saving German speech marks to S3...");
+        System.out.println("Saving speech marks to S3...");
 
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                 .withRegion("eu-west-1")
                 .build();
-        s3Client.putObject(DownloadWordList.BUCKET_NAME, S3_JSON_PATH, synthStream, null);
+        s3Client.putObject(DownloadWordList.BUCKET_NAME, s3Path, synthStream, null);
     }
 }
