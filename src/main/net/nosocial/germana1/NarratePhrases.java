@@ -9,8 +9,12 @@ import com.amazonaws.services.polly.AmazonPollyClientBuilder;
 import com.amazonaws.services.polly.model.*;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.json.JSONObject;
 
 import java.io.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class NarratePhrases {
@@ -18,8 +22,12 @@ public class NarratePhrases {
     public static final String S3_MP3_PATH_EN = "goethe_de/narrate/a1-phrases-%03d-02-en.mp3";
     public static final String S3_MP3_PATH_DE_SLOW = "goethe_de/narrate/a1-phrases-%03d-03-de-slow.mp3";
 
+    public static final AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+            .withRegion("eu-west-1")
+            .build();
 
-    public static void main(String[] args) throws FileNotFoundException {
+
+    public static void main(String[] args) throws IOException {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
 
         System.out.println("Narrating phrases with Amazon Polly...");
@@ -74,32 +82,35 @@ public class NarratePhrases {
         for (int i = 0; i < germanPhrases.length; i++) {
             System.out.println("Narrating phrase " + (i + 1) + " of " + germanPhrases.length);
 
-            String germanPhrase = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
+            String germanPhraseSSML = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
                     + quoteForPolly(germanPhrases[i])
                     + "\n<break time=\"5s\"/>\n"
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
-            String germanPhraseSlow = "<speak><mark name=\"sub_start\"/><prosody rate=\"x-slow\">\n"
+            String germanPhraseSlowSSML = "<speak><mark name=\"sub_start\"/><prosody rate=\"x-slow\">\n"
                     + quoteForPolly(germanPhrases[i])
                     + "\n<break time=\"5s\"/>\n"
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
-            String englishPhrase = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
+            String englishPhraseSSML = "<speak><mark name=\"sub_start\"/><prosody rate=\"medium\">\n"
                     + quoteForPolly(englishPhrases[i])
                     + "\n<break time=\"5s\"/>\n"
                     + "</prosody><mark name=\"sub_end\"/></speak>";
 
             String germanFileName = String.format(S3_MP3_PATH_DE, i + 1);
-            synthesizeAudio(polly, germanVoice, germanPhrase, germanFileName);
-            synthesizeSpeechMarks(polly, germanVoice, germanPhrase, germanFileName.replace(".mp3", ".json"));
+            synthesizeAudio(polly, germanVoice, germanPhraseSSML, germanFileName);
+            synthesizeSpeechMarks(polly, germanVoice, germanPhraseSSML, germanFileName.replace(".mp3", ".json"));
+            covertSpeechMarksToSubtitles(germanPhrases[i], germanFileName.replace(".mp3", ".json"), germanFileName.replace(".mp3", ".srt"));
 
             String germanSlowFileName = String.format(S3_MP3_PATH_DE_SLOW, i + 1);
-            synthesizeAudio(polly, germanVoice, germanPhraseSlow, germanSlowFileName);
-            synthesizeSpeechMarks(polly, germanVoice, germanPhraseSlow, germanSlowFileName.replace(".mp3", ".json"));
+            synthesizeAudio(polly, germanVoice, germanPhraseSlowSSML, germanSlowFileName);
+            synthesizeSpeechMarks(polly, germanVoice, germanPhraseSlowSSML, germanSlowFileName.replace(".mp3", ".json"));
+            covertSpeechMarksToSubtitles(germanPhrases[i], germanSlowFileName.replace(".mp3", ".json"), germanFileName.replace(".mp3", ".srt"));
 
             String englishFileName = String.format(S3_MP3_PATH_EN, i + 1);
-            synthesizeAudio(polly, englishVoice, englishPhrase, englishFileName);
-            synthesizeSpeechMarks(polly, englishVoice, englishPhrase, englishFileName.replace(".mp3", ".json"));
+            synthesizeAudio(polly, englishVoice, englishPhraseSSML, englishFileName);
+            synthesizeSpeechMarks(polly, englishVoice, englishPhraseSSML, englishFileName.replace(".mp3", ".json"));
+            covertSpeechMarksToSubtitles(englishPhrases[i], englishFileName.replace(".mp3", ".json"), germanFileName.replace(".mp3", ".srt"));
 
             if (i >= 2) {
                 break;
@@ -107,6 +118,32 @@ public class NarratePhrases {
         }
 
         System.out.println("Done.");
+    }
+
+    private static void covertSpeechMarksToSubtitles(String germanPhrase, String jsonS3Path, String srtS3Path) throws IOException {
+        System.out.println("Converting speech marks to subtitles...");
+        String jsonLines = s3Client.getObjectAsString(DownloadWordList.BUCKET_NAME, jsonS3Path);
+        String[] json = jsonLines.split("\n");
+        JSONObject jsonStart = new JSONObject(json[0]);
+        JSONObject jsonEnd = new JSONObject(json[1]);
+        int startMillis = jsonStart.getInt("time");
+        int endMillis = jsonEnd.getInt("time");
+
+        LocalTime startTime = LocalTime.ofNanoOfDay(startMillis * 1000000L).truncatedTo(ChronoUnit.MILLIS);
+        LocalTime endTime = LocalTime.ofNanoOfDay(endMillis * 1000000L).truncatedTo(ChronoUnit.MILLIS);
+
+        // See https://www.matroska.org/technical/subtitles.html#srt-subtitles
+        Writer w = new StringWriter();
+        try (BufferedWriter bw = new BufferedWriter(w)) {
+            bw.write("1\n");
+            bw.write(startTime.format(DateTimeFormatter.ofPattern("HH:mm:ss,SSS"))
+                    + " --> "
+                    + endTime.format(DateTimeFormatter.ofPattern("HH:mm:ss,SSS")) + "\n");
+            bw.write(germanPhrase + "\n");
+        }
+
+        InputStream srtS3Stream = new ByteArrayInputStream(w.toString().getBytes());
+        s3Client.putObject(DownloadWordList.BUCKET_NAME, srtS3Path, srtS3Stream, null);
     }
 
     private static String quoteForPolly(String text) {
@@ -127,9 +164,6 @@ public class NarratePhrases {
 
         System.out.println("Saving audio to S3...");
 
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                .withRegion("eu-west-1")
-                .build();
         s3Client.putObject(DownloadWordList.BUCKET_NAME, s3Path, synthStream, null);
     }
 

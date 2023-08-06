@@ -14,5 +14,6 @@
     <orderEntry type="library" name="amazonaws.aws.java.sdk.sts" level="project" />
     <orderEntry type="library" name="amazonaws.aws.java.sdk.polly" level="project" />
     <orderEntry type="library" name="amazonaws.aws.java.sdk.translate" level="project" />
+    <orderEntry type="library" name="json" level="project" />
   </component>
 </module>
