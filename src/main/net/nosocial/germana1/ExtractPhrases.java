@@ -17,7 +17,7 @@ import java.util.List;
 public class ExtractPhrases {
     public static final String FILE_NAME = "a1-phrases.txt";
     public static final String LOCAL_PATH = "out/" + FILE_NAME;
-    public static final String S3_PATH = "goethe_de/" + FILE_NAME;
+    public static final String S3_PATH = "goethe_de/extract/" + FILE_NAME;
 
     public static void main(String[] args) {
         System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
