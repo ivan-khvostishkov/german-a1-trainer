@@ -35,8 +35,8 @@ public class GenerateVideos {
 
         for (int i = 0; i < totalPhrases; i++) {
             generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_DE, i + 1));
-            generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_DE_SLOW, i + 1));
             generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_EN, i + 1));
+            generateVideoWithSubtitles(String.format(NarratePhrases.MP3_FILE_NAME_DE_SLOW, i + 1));
         }
 
         System.out.println("Uploading videos to S3...");
