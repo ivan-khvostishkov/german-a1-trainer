@@ -13,5 +13,6 @@
     <orderEntry type="library" name="amazonaws.aws.java.sdk.textract" level="project" />
     <orderEntry type="library" name="amazonaws.aws.java.sdk.sts" level="project" />
     <orderEntry type="library" name="amazonaws.aws.java.sdk.polly" level="project" />
+    <orderEntry type="library" name="amazonaws.aws.java.sdk.translate" level="project" />
   </component>
 </module>
