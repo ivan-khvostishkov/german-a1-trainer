@@ -10,9 +10,8 @@
       <root url="jar://$PROJECT_DIR$/lib/httpcore-4.4.13.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/ion-java-1.0.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.12.7.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.12.7.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.12.7.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-dataformat-cbor-2.12.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.12.6.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/joda-time-2.8.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jmespath-java-1.12.505.jar!/" />
     </CLASSES>
@@ -25,9 +24,8 @@
       <root url="jar://$PROJECT_DIR$/lib/httpcore-4.4.13-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/ion-java-1.0.2-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.12.7.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.12.7-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.12.7-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-dataformat-cbor-2.12.6-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.12.6-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/joda-time-2.8.1-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jmespath-java-1.12.505-javadoc.jar!/" />
     </JAVADOC>
@@ -40,9 +38,8 @@
       <root url="jar://$PROJECT_DIR$/lib/httpcore-4.4.13-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/ion-java-1.0.2-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.12.7.1-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.12.7-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.12.7-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-dataformat-cbor-2.12.6-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.12.6-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/joda-time-2.8.1-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jmespath-java-1.12.505-sources.jar!/" />
     </SOURCES>

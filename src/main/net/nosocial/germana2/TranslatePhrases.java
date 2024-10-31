@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2023 Ivan Khvostishkov & NoSocial.Net
  */
-package net.nosocial.germana1;
+package net.nosocial.germana2;
 
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
@@ -18,15 +18,15 @@ public class TranslatePhrases {
     /**
      * NOTE: we manually review and edit the extracted phrases to join multi-line phrases lines into a single line
      */
-    public static final String EDITED_FILE_NAME = "a1-phrases-edited.txt";
+    public static final String EDITED_FILE_NAME = "a2-phrases-edited.txt";
     public static final String LOCAL_PATH_IN = "out/" + EDITED_FILE_NAME;
 
-    public static final String OUTPUT_FILE_NAME = "a1-phrases-english.txt";
+    public static final String OUTPUT_FILE_NAME = "a2-phrases-english.txt";
     public static final String LOCAL_PATH_OUT = "out/" + OUTPUT_FILE_NAME;
     public static final String S3_PATH = "goethe_de/extract/" + OUTPUT_FILE_NAME;
 
     public static void main(String[] args) throws IOException {
-        System.out.println("German A1 Trainer Tool (c) 2023 by NoSocial.Net");
+        System.out.println("German A2 Hands-free Trainer (c) 2023 by NoSocial.Net");
 
         System.out.println("Translating phrases with Amazon Translate...");
 
