@@ -11,3 +11,5 @@ Check the result and the uploaded trainer videos on my YouTube channel:
 * German B1: TBD
 
 To prepare for the exam, I recommend that you play the video in the Firefox browser on your mobile device and listen to it carefully through headphones from the locked screen while walking outside, breathing the fresh air and keeping your hands free from your phone.
+
+_Note: Parts of the code of this project were generated with [Amazon Q Developer](https://aws.amazon.com/q/developer/)._

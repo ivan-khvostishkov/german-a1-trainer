@@ -21,7 +21,7 @@ public class DownloadWordList {
     public static final String FILE_URL = "https://www.goethe.de/pro/relaunch/prf/de/Goethe-Zertifikat_A2_Wortliste.pdf";
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        System.out.println("German A2 Hands-free Trainer (c) 2023 by NoSocial.Net");
+        System.out.println("German A2 Hands-free Trainer (c) 2023-2024 by NoSocial.Net");
 
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                 .withCredentials(new ProfileCredentialsProvider())

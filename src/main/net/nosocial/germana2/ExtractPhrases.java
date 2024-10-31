@@ -20,7 +20,7 @@ public class ExtractPhrases {
     public static final String S3_PATH = "goethe_de/extract/" + FILE_NAME;
 
     public static void main(String[] args) {
-        System.out.println("German A2 Hands-free Trainer (c) 2023 by NoSocial.Net");
+        System.out.println("German A2 Hands-free Trainer (c) 2023-2024 by NoSocial.Net");
 
         System.out.println("Extracting phrases with Amazon Textract...");
 

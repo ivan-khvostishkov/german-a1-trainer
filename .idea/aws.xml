@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="accountSettings">
+    <option name="activeProfile" value="profile:default" />
     <option name="activeRegion" value="eu-west-1" />
     <option name="recentlyUsedProfiles">
       <list>
+        <option value="profile:default" />
         <option value="profile:358542211337_AdministratorAccess" />
       </list>
     </option>
@@ -13,5 +15,8 @@
         <option value="us-east-1" />
       </list>
     </option>
+  </component>
+  <component name="connectionManager">
+    <option name="activeConnectionId" value="sso;us-east-1;https://view.awsapps.com/start" />
   </component>
 </project>
