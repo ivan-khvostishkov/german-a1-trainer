@@ -31,7 +31,7 @@ https://github.com/ivan-khvostishkov/german-a1-trainer
 
 # German A2 Hands-Free Trainer   
 
-German A2 Hands-free Trainer narrates phrases from German A1: Start Deutsch 1 word list for the Goethe Insitut exam:
+German A2 Hands-free Trainer narrates phrases from German A2 word list for the Goethe Insitut exam:
 
 https://www.goethe.de/de/spr/kup/prf/prf/sd1/inf.html
 
