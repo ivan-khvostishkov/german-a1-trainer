@@ -3,6 +3,7 @@
  */
 package net.nosocial.germana2;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectListing;
@@ -17,6 +18,7 @@ public class GenerateVideos {
     public static final String S3_MP4_PATH = "goethe_de/videos-a2/";
 
     public static final AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+            .withCredentials(new ProfileCredentialsProvider())
             .withRegion("eu-west-1")
             .build();
 

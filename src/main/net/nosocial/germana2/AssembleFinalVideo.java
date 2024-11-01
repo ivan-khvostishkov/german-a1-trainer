@@ -3,6 +3,7 @@
  */
 package net.nosocial.germana2;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import net.nosocial.util.ProcessUtil;
@@ -15,7 +16,9 @@ import static net.nosocial.germana2.GenerateVideos.countNarratedFiles;
 public class AssembleFinalVideo {
     private static final String FILE_NAME = "german-a2-phrases.mp4";
     public static final String PATH = "goethe_de/" + FILE_NAME;
+
     public static final AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+            .withCredentials(new ProfileCredentialsProvider())
             .withRegion("eu-west-1")
             .build();
 
