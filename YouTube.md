@@ -35,11 +35,11 @@ German A2 Hands-free Trainer narrates phrases from German A2 word list for the G
 
 https://www.goethe.de/de/spr/kup/prf/prf/sd1/inf.html
 
-To prepare for the exam, I recommend that you play the video in the Firefox browser on your mobile device and listen to it carefully through headphones from the locked screen while walking outside, breathing the fresh air and keeping your hands free from your phone.
-
 For convenience and for regular training, visit the radio app that jumps to the random position of the video and loops it indefinitely:
 
 https://german-a2.nosocial.net/
+
+To prepare for the exam, I recommend that you open the app and play the video in the Firefox browser on your mobile device and listen to it carefully through headphones from the locked screen while walking outside, breathing the fresh air.
 
 Check the other German trainer videos on my YouTube channel:
 
