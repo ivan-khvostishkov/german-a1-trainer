@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>German A2 Hands-Free Trainer</title>
+    <meta charset="UTF-8" />
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="video-container">
+    <div id="player"></div>
+</div>
+
+<script>
+    // German A2 Hands-Free Trainer
+    // https://www.youtube.com/watch?v=esvhhEGLTNA
+    let VIDEO_ID = 'esvhhEGLTNA';
+
+    // YouTube Player API code
+    let tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    let firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    let player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            // Replace VIDEO_ID with your YouTube video ID
+            videoId: VIDEO_ID,
+            playerVars: {
+                'autoplay': 1,
+                'controls': 1,
+                'rel': 0,
+                'showinfo': 0,
+                'loop': 1,
+                'playlist': VIDEO_ID // Required for looping
+            },
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        // Get video duration
+        const duration = player.getDuration();
+        // Generate random start time (between 0 and duration-10 seconds)
+        const randomTime = Math.floor(Math.random() * (duration - 10));
+        // Seek to random position
+        player.seekTo(randomTime, true);
+        // Start playing
+        player.playVideo();
+    }
+</script>
+</body>
+</html>
